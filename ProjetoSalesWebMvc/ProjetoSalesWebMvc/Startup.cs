@@ -37,7 +37,8 @@ namespace ProjetoSalesWebMvc
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddDbContext<ProjetoSalesWebMvcContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("ProjetoSalesWebMvcContext")));
+                    options.UseMySql(Configuration.GetConnectionString("ProjetoSalesWebMvcContext"), builder =>
+                        builder.MigrationsAssembly("ProjetoSalesWebMvc")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
