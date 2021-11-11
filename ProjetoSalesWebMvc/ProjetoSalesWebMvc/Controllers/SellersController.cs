@@ -3,7 +3,9 @@ using ProjetoSalesWebMvc.Models;
 using ProjetoSalesWebMvc.Models.ViewModels;
 using ProjetoSalesWebMvc.Services;
 using ProjetoSalesWebMvc.Services.Exceptions;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ProjetoSalesWebMvc.Controllers
 {
@@ -44,14 +46,14 @@ namespace ProjetoSalesWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = $"Id {id} not provided" });
             }
 
             var seller = _sellerService.FindById(id.Value);
 
             if (seller == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = $"Id {id} not found" });
             }
 
             return View(seller);
@@ -69,14 +71,14 @@ namespace ProjetoSalesWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = $"Id {id} not provided" });
             }
 
             var seller = _sellerService.FindById(id.Value);
 
             if (seller == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = $"Id {id} not found" });
             }
 
             return View(seller);
@@ -86,14 +88,14 @@ namespace ProjetoSalesWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = $"Id {id} not provided" });
             }
 
             var seller = _sellerService.FindById(id.Value);
 
             if (seller == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = $"Id {id} not found" });
             }
 
             List<Department> departments = _departmentService.FindAll();
@@ -108,7 +110,7 @@ namespace ProjetoSalesWebMvc.Controllers
         {
             if (id != seller.Id)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
             }
 
             try
@@ -117,14 +119,21 @@ namespace ProjetoSalesWebMvc.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundException)
+            catch (ApplicationException e)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
-            catch (DbConcurrencyException)
+        }
+
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel
             {
-                return BadRequest();
-            }
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+
+            return View(viewModel);
         }
     }
 }
